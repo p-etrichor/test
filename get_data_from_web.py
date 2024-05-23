@@ -1,20 +1,46 @@
 
 import pandas as pd
 import csv
+
+#먼저 pykrx 그다음 yfinance 마지막은 googlefinance..?
+from pykrx import stock
 import yfinance as yf
 
+#날짜 계산을 위한 numpy, 및 지연을 위한 time
+import numpy as np
+import time 
+
+
+location = 'D:/test/test/'
+filename = 'test_code_simple.csv'
+
+def get_date(start, period):
+    date1 = np.array(start, dtype="datetime64[D]")
+    date2 = date1 + period
+    end = str(date2)
+
+    return end
+
+def get_numbers_from(start, end, code):
+    df = stock.get_market_ohlcv(start, end, code)
+    time.sleep(1)
+    highest = max(df['고가'])
+    closing = df['종가'].iloc[-1]
+    
+    
+
 #data는 csv로 가져온다 - 종목코드, 진입날짜, 행사가격이 line으로 쌓여있는 csv
+raw_data = pd.read_csv(location+filename, dtype=object)
+#raw_data['test']= 0
 
+#pykrx에서 데이터 조회
+start_date = "2024-01-02"
+start = np.array(start_date, dtype="datetime64[D]")
+#end_date = "2024-02-03"
+end_date = start + 30
+str(end_date)
 
-location = 'C:/Users/yuhs19/Downloads/'
-filename = 'samu20240125.csv'
-
-msft = yf.Ticker("MSFT")
-msft.info
-hist = msft.history(period="1mo")
-start = "2023-01-01"
-end = start + 3
-df = yf.download("MSFT", "2023-01-02", "2023-02-02")
+df = stock.get_market_ohlcv(start_date, str(end_date), "005930")
 
 
 #dataframe으로 가져오기
