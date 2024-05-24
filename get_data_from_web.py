@@ -50,7 +50,7 @@ for i in range(len(raw_data)):
     raw_data.loc[i, 'highest'] = high
     raw_data.loc[i, 'closing'] = close
     
-    #print(high, close)
+    #print(high, close) 
 
 
 #data.info()
