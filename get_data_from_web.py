@@ -1,19 +1,15 @@
 
 import pandas as pd
 import csv
-
 #먼저 pykrx 그다음 yfinance 마지막은 googlefinance..?
 from pykrx import stock
 import yfinance as yf
-
 #날짜 계산을 위한 numpy, 및 지연을 위한 time
 import numpy as np
 import time 
 
 
-location = 'D:/test/test/'
-filename = 'test_code_simple.csv'
-
+#시작일로부터 period만큼 후의 날짜 생성
 def get_date(start, period):
     date1 = np.array(start, dtype="datetime64[D]")
     date2 = date1 + period
@@ -21,35 +17,42 @@ def get_date(start, period):
 
     return end
 
+
+#기간내 최고가와 클로징종가 
 def get_numbers_from(start, end, code):
     df = stock.get_market_ohlcv(start, end, code)
     time.sleep(1)
     highest = max(df['고가'])
     closing = df['종가'].iloc[-1]
     
-    #최고가와 클로징종
     return highest, closing
     
     
+location = 'D:/test/test/'
+filename = 'test_code_simple.csv'
+
 
 #data는 csv로 가져온다 - 종목코드, 진입날짜, 행사가격이 line으로 쌓여있는 csv
 raw_data = pd.read_csv(location+filename, dtype=object)
-#raw_data['test']= 0
+
 
 #pykrx에서 데이터 조회
 start_date = "2024-01-02"
-start = np.array(start_date, dtype="datetime64[D]")
-#end_date = "2024-02-03"
-end_date = start + 30
-str(end_date)
-
-df = stock.get_market_ohlcv(start_date, str(end_date), "005930")
+end_date = get_date(start_date, 30)
 
 
-#dataframe으로 가져오기
-data = pd.read_csv(location+filename)
-#data변환 및 정리
-#일단 파일을 그대로 따운받고 NaN이 있는 행은 다 날릴것, 그리고 필요없는 열도 다 날릴것
+for i in range(len(raw_data)):
+    #print(i)
+    icode = raw_data.loc[i, 'code']
+    
+    high, close = get_numbers_from(start_date, end_date, icode)
+
+    raw_data.loc[i, 'highest'] = high
+    raw_data.loc[i, 'closing'] = close
+    
+    #print(high, close)
+
+
 #data.info()
 #data.columns
 #1#번
