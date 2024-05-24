@@ -27,6 +27,9 @@ def get_numbers_from(start, end, code):
     highest = max(df['고가'])
     closing = df['종가'].iloc[-1]
     
+    #최고가와 클로징종
+    return highest, closing
+    
     
 
 #data는 csv로 가져온다 - 종목코드, 진입날짜, 행사가격이 line으로 쌓여있는 csv
