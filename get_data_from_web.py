@@ -40,7 +40,7 @@ def back_test(raw_data, harvest_profit, period):
             else:
                 summarine_profit = summarine_profit + raw_data.loc[i, 'loss_at_close']
     
-    print("이익률 " + str(harvest_profit) + ", " + str(period) + "일 적용된 수익률 : " + str(round(summarine_profit, 5) * 100))
+    print("수익률 " + str(harvest_profit) + ", " + str(period) + "일 적용된 수익률 : " + str(round(summarine_profit, 5) * 100))
     
     return summarine_profit
 
@@ -81,11 +81,8 @@ raw_data = raw_data.astype({'strike_price':'int32'})
 
 
 
-for period in range(1, 3):
+for period in range(61, 91):
     data_from_pykrx(raw_data, period, tax)
     
-    for harvest_profit in range(1, 10):
-        harvest_profit_ratio = harvest_profit / 100
-        
-    
-        final.loc[period, harvest_profit] = back_test(raw_data, harvest_profit_ratio, period)
+    for harvest_profit in range(1, 30):
+        final.loc[period, harvest_profit] = back_test(raw_data, harvest_profit / 100, period)
