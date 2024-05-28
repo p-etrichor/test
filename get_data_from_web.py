@@ -49,7 +49,7 @@ def back_test(raw_data, harvest_profit, period):
 location = 'D:/test/test/'
 filename = 'test_code_simple.csv'
 #harvest_profit = 0.05
-period = 90
+period = 60
 final = pd.DataFrame({'기간':[1,2,3,...,period]})
 #이게 참....period에 맞춰서 한번 뿌리면 harvest_profit에 대한 분석은 쉽다....
 #그러면 period에 의해 가져오는 함수 하나, df를 받아서 분석하는 함수 하나....
