@@ -40,17 +40,37 @@ def back_test(raw_data, harvest_profit, period):
             else:
                 summarine_profit = summarine_profit + raw_data.loc[i, 'loss_at_close']
     
-    print("이익률 " + str(harvest_profit) + ", " + str(period) + "일 적용된 수익률 : " + str(round(summarine_profit, 5) * 100))
+    print("수익률 " + str(harvest_profit) + ", " + str(period) + "일 적용된 수익률 : " + str(round(summarine_profit, 5) * 100))
     
     return summarine_profit
 
+
+def data_from_pykrx(raw_data, period, tax):
+    for i in range(len(raw_data)):
+        icode = raw_data.loc[i, 'code']
+        print("get from pykrx for period " + str(period) +"일 기간 --> " + str(i) + "/" + str(len(raw_data)) + "종목")
+        
+        start_date = raw_data.loc[i, 'issuedate']
+        end_date = get_date(start_date, period)
+        
+        init, high, close = get_numbers_from(start_date, end_date, icode)
+
+        raw_data.loc[i, 'initial'] = init
+        raw_data.loc[i, 'highest'] = high
+        raw_data.loc[i, 'closing'] = close
+        
+    raw_data['upper_room'] = raw_data['strike_price'] / raw_data['initial']
+    raw_data['profit_highest'] = (raw_data['highest'] - raw_data['initial']) / raw_data['initial'] - tax
+    raw_data['loss_at_close'] = (raw_data['closing'] - raw_data['initial']) / raw_data['initial'] - tax
+    
+    return raw_data
     
     
 location = 'D:/test/test/'
 filename = 'test_code_simple.csv'
 #harvest_profit = 0.05
-period = 90
-final = pd.DataFrame({'기간':[1,2,3,...,period]})
+#period = 60
+final = pd.DataFrame()
 #이게 참....period에 맞춰서 한번 뿌리면 harvest_profit에 대한 분석은 쉽다....
 #그러면 period에 의해 가져오는 함수 하나, df를 받아서 분석하는 함수 하나....
 tax = 0.005
@@ -60,28 +80,9 @@ raw_data = pd.read_csv(location+filename, dtype=object)
 raw_data = raw_data.astype({'strike_price':'int32'})
 
 
-#pykrx에서 데이터 조회
-for i in range(len(raw_data)):
-    icode = raw_data.loc[i, 'code']
-    print("analyzing " + str(i) + "/" + str(len(raw_data)))
-    
-    start_date = raw_data.loc[i, 'issuedate']
-    end_date = get_date(start_date, period)
-    
-    init, high, close = get_numbers_from(start_date, end_date, icode)
 
-    raw_data.loc[i, 'initial'] = init
-    raw_data.loc[i, 'highest'] = high
-    raw_data.loc[i, 'closing'] = close
+for period in range(61, 91):
+    data_from_pykrx(raw_data, period, tax)
     
-raw_data['upper_room'] = raw_data['strike_price'] / raw_data['initial']
-raw_data['profit_highest'] = (raw_data['highest'] - raw_data['initial']) / raw_data['initial'] - tax
-raw_data['loss_at_close'] = (raw_data['closing'] - raw_data['initial']) / raw_data['initial'] - tax
-
-#대략 백테스트 수익률 변화해가며
-
-for harvest_profit in range(100):
-    harvest_profit = harvest_profit / 100
-    back_test(raw_data, harvest_profit, period)
-    
-    
+    for harvest_profit in range(1, 30):
+        final.loc[period, harvest_profit] = back_test(raw_data, harvest_profit / 100, period)
